@@ -1,0 +1,15 @@
+version: '3.8'
+
+services:
+  app:
+    build: .
+
+    container_name: menu_app_container
+
+    ports:
+      - "8000:8000"
+
+    volumes:
+      - ./menu.db:/app/menu.db
+      - ./static/images:/app/static/images
+    restart: always

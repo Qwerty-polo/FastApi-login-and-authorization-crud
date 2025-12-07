@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <title>Мій Ресторан</title>
+    <style>
+        /* Трохи стилів, щоб було гарно */
+        body { font-family: sans-serif; padding: 20px; }
+        .grid { display: flex; gap: 20px; flex-wrap: wrap; }
+        .card {
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 15px;
+            width: 250px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        .card img { max-width: 100%; border-radius: 5px; }
+        .price { color: green; font-weight: bold; font-size: 1.2em; }
+    </style>
+</head>
+<body>
+
+    <h1>🍕 Меню нашого ресторану</h1>
+    <div id="menu-container" class="grid">
+        <p>Завантаження меню...</p>
+    </div>
+
+    <script>
+        // Ця функція запускається, коли відкривається сторінка
+        async function getMenu() {
+            try {
+                // 1. Робимо запит до твого FastAPI сервера
+                // Зверни увагу: ми звертаємось до localhost:8000
+                const response = await fetch('http://127.0.0.1:8000/dishes');
+
+                // 2. Перевіряємо, чи сервер відповів ОК
+                if (!response.ok) {
+                    throw new Error("Помилка з'єднання з сервером");
+                }
+
+                // 3. Перетворюємо відповідь у JSON (масив страв)
+                const dishes = await response.json();
+
+                // 4. Очищаємо контейнер від напису "Завантаження..."
+                const container = document.getElementById('menu-container');
+                container.innerHTML = '';
+
+                // 5. Проходимося по кожній страві і малюємо картку
+                dishes.forEach(dish => {
+                    // Формуємо посилання на картинку
+                    // Якщо картинка є - беремо її, якщо ні - заглушка
+                    // Важливо: додаємо адресу сервера http://127.0.0.1:8000/ перед шляхом
+                    const imageUrl = dish.image_url
+                        ? `http://127.0.0.1:8000/${dish.image_url}`
+                        : 'https://via.placeholder.com/250x150?text=No+Image';
+
+                    const dishHtml = `
+                        <div class="card">
+                            <img src="${imageUrl}" alt="${dish.name}">
+                            <h3>${dish.name}</h3>
+                            <p>${dish.description || 'Опис відсутній'}</p>
+                            <p class="price">${dish.price} грн</p>
+                        </div>
+                    `;
+                    // Додаємо картку на сторінку
+                    container.insertAdjacentHTML('beforeend', dishHtml);
+                });
+
+            } catch (error) {
+                console.error(error);
+                document.getElementById('menu-container').innerHTML =
+                    `<p style="color:red">Не вдалося завантажити меню. Перевір, чи запущений сервер!</p>`;
+            }
+        }
+
+        // Запуск функції
+        getMenu();
+    </script>
+
+</body>
+</html>
