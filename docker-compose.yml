@@ -3,13 +3,17 @@ version: '3.8'
 services:
   app:
     build: .
+    # Крапка (.) означає: "Шукай Dockerfile у цій же папці тобто ту яку ми вказали "app" і будуй з нього образ".
 
     container_name: menu_app_container
 
     ports:
       - "8000:8000"
+    # "Вхідні двері".
+    # Зліва (8000) — порт на твоєму комп'ютері (Windows/Linux).
+    # Справа (8000) — порт всередині контейнера (де працює Uvicorn).
 
     volumes:
-      - ./menu.db:/app/menu.db
-      - ./static/images:/app/static/images
+      - ./menu_data:/app/data #Ліворуч до знака : тобто (./menu_data):(/app/data), (./menu_data): Файл на твоєму реальному комп'ютері (Linux/Windows) якшо його немає то докер створить його сам .
+      - ./static/images:/app/static/images #Праворуч (/app/data): Місце, де Python всередині контейнера шукає базу
     restart: always
