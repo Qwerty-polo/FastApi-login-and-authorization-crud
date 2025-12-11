@@ -1,6 +1,6 @@
 from pydantic import BaseModel, ConfigDict, Field
 from typing import List, Dict, Optional
-
+from datetime import datetime
 
 class DishBase(BaseModel):
     name: str
@@ -48,4 +48,27 @@ class UserResponse(BaseModel):
     id: int
     username: str = Field(min_length=5, max_length=70)
 
+    model_config = ConfigDict(from_attributes=True)
+
+class OrderItemCreate(BaseModel):
+    dish_id: int
+    quantity: int
+
+class OrderCreate(BaseModel):
+    items: List[OrderItemCreate]
+
+class OrderItemResponse(BaseModel):
+    id: int
+    dish_id: int
+    quantity: int
+    price: float
+
+    model_config = ConfigDict(from_attributes=True)
+
+class OrderResponse(BaseModel):
+    id: int
+    status: str
+    created_at: datetime | None
+    items: List[OrderItemResponse]
+    total_price: float
     model_config = ConfigDict(from_attributes=True)

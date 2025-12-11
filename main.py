@@ -4,7 +4,7 @@ from fastapi.staticfiles import StaticFiles
 
 from fastapi.middleware.cors import CORSMiddleware
 
-from Routers import menu, login
+from Routers import menu, login, orders, simple_ws
 app = FastAPI()
 
 app.add_middleware(
@@ -23,6 +23,9 @@ app.mount('/static', StaticFiles(directory='static'), name='static')
 
 app.include_router(menu.router, tags=['Menu'])
 app.include_router(login.router, tags=['login'])
+app.include_router(orders.router,tags=['Orders'])
+app.include_router(simple_ws.router,tags=['WebSocket'])
+
 
 if __name__ == '__main__':
     uvicorn.run("main:app",reload=False)

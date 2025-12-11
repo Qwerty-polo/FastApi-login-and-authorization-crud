@@ -12,11 +12,10 @@ from Routers.auth import verify_password, get_password_hash
 from database import get_db
 
 from fastapi.security import HTTPBearer
-from models import User
+from models import UserModel
 from schemas import UserLogin, UserResponse
 
 router = APIRouter()
-SessionDep = Annotated[AsyncSession, Depends(get_db)]
 
 
 security_headers = HTTPBearer(auto_error=False) #Це означає: "Якщо токена в заголовку немає — не кричи 'Помилка!', а промовчи"
@@ -35,6 +34,8 @@ config.JWT_COOKIE_CSRF_PROTECT = False #За замовчуванням сист
 ################
 security = AuthX(config) #ініціалізація (запуск) системи безпеки з твоїми налаштуваннями.
 
+SessionDep = Annotated[AsyncSession, Depends(get_db)]
+UserDep = Annotated[dict, Depends(security.access_token_required)]
 
 
 
@@ -42,7 +43,7 @@ security = AuthX(config) #ініціалізація (запуск) систем
 async def login_for_access_token(
         creds: UserLogin,
         db: SessionDep):
-    query = select(User).where(User.username == creds.username)
+    query = select(UserModel).where(UserModel.username == creds.username)
     result = await db.execute(query)
     user = result.scalar_one_or_none()
 
@@ -58,7 +59,7 @@ async def login_for_access_token(
 
 @router.post('/register', response_model=UserResponse)
 async def register(user: UserLogin, db: SessionDep):
-    query = (select(User).where(User.username == user.username))
+    query = (select(UserModel).where(UserModel.username == user.username))
     result = await db.execute(query)
     user_one = result.scalar_one_or_none()
 
@@ -67,7 +68,7 @@ async def register(user: UserLogin, db: SessionDep):
 
     hash_pass = await get_password_hash(user.password)
 
-    new_user = User(
+    new_user = UserModel(
         username=user.username,
         hashed_password=hash_pass
     )
@@ -80,7 +81,7 @@ async def register(user: UserLogin, db: SessionDep):
 
 @router.post("/login")
 async def login(creds: UserLogin,response: Response,db: SessionDep):
-    query = select(User).where(User.username == creds.username)
+    query = select(UserModel).where(UserModel.username == creds.username)
     result = await db.execute(query)
     user = result.scalar_one_or_none()
     if not user or not await verify_password(creds.password, user.hashed_password):

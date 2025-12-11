@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <title>Кухня - Замовлення</title>
+    <style>
+        body { font-family: sans-serif; padding: 20px; background-color: #f4f4f4; }
+        h1 { color: #333; }
+        #orders { list-style-type: none; padding: 0; }
+        .order-card {
+            background: white;
+            border-left: 5px solid green;
+            padding: 15px;
+            margin-bottom: 10px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            font-size: 1.2em;
+            animation: popIn 0.5s ease-out;
+        }
+        @keyframes popIn {
+            0% { transform: scale(0.8); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+    </style>
+</head>
+<body>
+    <h1>👨‍🍳 Екран Кухні (Live)</h1>
+    <ul id="orders"></ul>
+
+    <script>
+        // Підключаємося до нашого WebSocket роутера
+        // Зверни увагу на /ws/kitchen (як ми прописали в router)
+        const ws = new WebSocket("ws://localhost:8000/ws/kitchen");
+
+        ws.onmessage = function(event) {
+            // Коли приходить повідомлення від сервера
+            const ordersList = document.getElementById('orders');
+            const newOrder = document.createElement('li');
+
+            newOrder.className = 'order-card';
+            newOrder.textContent = event.data; // Текст повідомлення
+
+            // Додаємо нове замовлення зверху списку
+            ordersList.prepend(newOrder);
+        };
+
+        ws.onopen = () => console.log("Підключено до кухні!");
+        ws.onclose = () => console.log("Відключено від кухні.");
+    </script>
+</body>
+</html>
