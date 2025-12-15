@@ -5,7 +5,7 @@ services:
     build: .
     # Крапка (.) означає: "Шукай Dockerfile у цій же папці тобто ту яку ми вказали "app" і будуй з нього образ".
 
-    container_name: menu_app_container
+    container_name: menu_container
 
     ports:
       - "8000:8000"

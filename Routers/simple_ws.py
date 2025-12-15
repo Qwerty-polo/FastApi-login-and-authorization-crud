@@ -1,7 +1,6 @@
 from fastapi import APIRouter, WebSocket, WebSocketDisconnect
 from typing import List
 
-# Використовуємо APIRouter, щоб підключити це до main.py
 router = APIRouter()
 
 # --- База де лежать усі зєднання всі сайти які зайшли на нашу апі ---
@@ -22,7 +21,7 @@ class ConnectionManager:
         # Якщо кухар пішов - видаляємо зі списку
         self.active_connections.remove(websocket)
 
-    #проходимся по всім нашим сайтам і кожному відправляєм повідомлення ро замовлення
+    #проходимся по всім нашим сайтам і кожному відправляєм повідомлення про замовлення
     async def broadcast(self, message: str):
         # Ця функція найважливіша!
         # Вона біжить по списку active_connections і кожному відправляє повідомлення

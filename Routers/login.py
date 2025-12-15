@@ -30,9 +30,9 @@ config.JWT_TOKEN_LOCATION = ["cookies", "headers"] #Інструкція охо�
 ################
 config.JWT_COOKIE_CSRF_PROTECT = False #За замовчуванням система вимагає два документи: перепустку (токен) + довідку (CSRF).
 # Оскільки у Swagger складно передавати цю "довідку", ми сказали: "Поки що пропускай тільки по перепустці, не ускладнюй
-
 ################
 security = AuthX(config) #ініціалізація (запуск) системи безпеки з твоїми налаштуваннями.
+
 
 SessionDep = Annotated[AsyncSession, Depends(get_db)]
 UserDep = Annotated[dict, Depends(security.access_token_required)]
@@ -90,8 +90,8 @@ async def login(creds: UserLogin,response: Response,db: SessionDep):
     token = security.create_access_token(uid=str(user.id))
     response.set_cookie(config.JWT_ACCESS_COOKIE_NAME, token)
     return {"access_token": token}
-
-@router.get("/protected", dependencies=[Depends(security.access_token_required),Depends(security_headers)])
+#dependencies=[Depends(security.access_token_required),Depends(security_headers)]
+@router.get("/protected")
 async def protected(db: SessionDep):
     return {"hello": "world"}
 
